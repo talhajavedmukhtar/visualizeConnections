@@ -94,3 +94,12 @@ input[type=text] {
   -webkit-border-radius: 5px 5px 5px 5px;
   border-radius: 5px 5px 5px 5px;
 }
+
+.converged {
+  text-align: center;
+  color: #52ADDA;
+  margin-left: 30px;
+  margin-top: 15px;
+  width: 50%;
+  float: left;
+}

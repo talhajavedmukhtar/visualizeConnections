@@ -304,6 +304,7 @@ input {
 
 .converged {
   text-align: center;
-  margin: auto;
+  color: #52ADDA;
+  margin-left: 50px;
   width: 50%;
 }

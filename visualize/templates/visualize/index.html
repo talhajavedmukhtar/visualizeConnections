@@ -19,21 +19,24 @@
 		      <input type="text" id="asn" class="fadeIn second" name="asn" placeholder="Enter ASN#">
 		      <button class="fadeIn fourth" name="enter" id="enter" type="button">ENTER</button>
 		      <!--<input type="submit" class="fadeIn fourth" id="enter" name="enter" value="ENTER">-->
+		      <div class="converged" id="converged" >
+	  			
+	  		  </div>
 		    </form>
 	    </div>
 	    <div class="graphDiv" id="graphDiv">
 	  	
 	  	</div>
-	  	<div class="converged" id="converged" >
-	  		<p>Converged!</p>
-	  	</div>
+	  	
 	  </div>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
     <script src="{% static 'js/app.js' %}"></script>
     <script type="text/javascript">
+    	$("#converged").hide();
     	$("#enter").click(function(){
-    		$("#converged").hide()
+    		$("#converged").html("<p> Generating graph.. This could take some time </p>")
+    		$("#converged").show()
     		var asn = $("#asn").val();
     		console.log("clicked!")
 
@@ -60,8 +63,7 @@
 	        			$('#graphDiv').html(graphDiv);
 
 	        			if(nextASN == "noVictor"){
-	        				$("#converged").show();
-	        				alert("Converged");
+	        				$("#converged").html("<p> Graph Generation Complete </p>")
 	        			}else{
 	        				setTimeout(function () {
 					        	recursive_get_graph(nextASN,graphSoFar)

@@ -6,12 +6,14 @@ except:
 import networkx as nx
 
 class Stack:
-    def __init__(self):
-    	self.seenSoFar = []
+    def __init__(self,originASN):
+    	self.origin = originASN
+    	self.seenSoFar = [originASN]
     	self.stack = []
+    	self.eatenUp = [originASN]
 
     def add(self, ASN):
-        if ASN not in self.seenSoFar:
+        if ASN not in self.seenSoFar and (ASN != self.origin):
         	self.seenSoFar.append(ASN)
         	self.stack.append(ASN)
         	return True
@@ -22,18 +24,33 @@ class Stack:
         if len(self.stack) <= 0:
             return None
         else:
-            return self.stack.pop()
+        	element = self.stack.pop()
+        	self.eatenUp.append(element)
+
+        	return element
+
+    def __str__(self):
+    	return "STACK: " + str(self.stack) + " || SEEN SO FAR: "+ str(self.seenSoFar)
+
+
 
 class Graph:
-	def __init__(self):
+	def __init__(self,originASN):
+		self.origin = originASN
 		self.graph = nx.Graph()
-		self.asnStack = Stack()
+		self.asnStack = Stack(originASN)
 		self.nodeToASNDict = {}
 		self.labels = {}
 
 		self.nodes = []
 		self.edges = []
 		self.weights = []
+
+	def nodeExpanded(self,asn):
+		if asn in self.asnStack.eatenUp[:-1]:
+			return True
+		else:
+			return False
 
 	def getASNFromNodeNo(self,nodeNo):
 		for key,val in self.nodeToASNDict.items():
@@ -86,54 +103,26 @@ class Graph:
 			if node not in nodesSoFar:
 				cleanedNewNodes.append(node)
 
-		#print("Nodes so far: ",nodesSoFar)
-		#print("Cleaned new nodes: ",cleanedNewNodes)
+		#Add the new nodes
+		for i,node in enumerate(cleanedNewNodes):
+			nodeIdentifier = noOfNodesSoFar + i
+			self.graph.add_node(nodeIdentifier)
+			self.nodeToASNDict[node] = nodeIdentifier
+			self.labels[nodeIdentifier] = node
+			self.nodes.append(nodeIdentifier)
 
-		print("")
-		print("")
-		print("")
-		print("")
-		print("Nodes so far: ",nodesSoFar)
-		print("New nodes: ",newNodes)
-		print("Cleaned nodes: ",cleanedNewNodes)
-		print("New edges: ", newEdges)
-		#print("Positions: ", self.graph.pos)
-		print("")
-		print("")
-		print("")
-		print("")
+		#Add the new edges
+		for i,edgeKey in enumerate(newEdges.keys()):
+			node1 = self.nodeToASNDict[edgeKey[0]]
+			node2 = self.nodeToASNDict[edgeKey[1]]
 
-		try:
-			#Add the new nodes
-			for i,node in enumerate(cleanedNewNodes):
-				nodeIdentifier = noOfNodesSoFar + i
-				self.graph.add_node(nodeIdentifier)
-				self.nodeToASNDict[node] = nodeIdentifier
-				self.labels[nodeIdentifier] = node
-				self.nodes.append(nodeIdentifier)
+			self.graph.add_edge(node1,node2)
 
-			#Add the new edges
-			for i,edgeKey in enumerate(newEdges.keys()):
-				node1 = self.nodeToASNDict[edgeKey[0]]
-				node2 = self.nodeToASNDict[edgeKey[1]]
-
-				self.graph.add_edge(node1,node2)
-
-				#only save edge if it is really new
-				if(node2,node1) not in self.edges:
-					self.edges.append((node1,node2))
-					self.weights.append(newEdges[edgeKey])
-		except Exception as e:
-			print("Error: ",e)
+			#only save edge if it is really new
+			if(node2,node1) not in self.edges:
+				self.edges.append((node1,node2))
+				self.weights.append(newEdges[edgeKey])
 
 
 		#Get the position layout
 		self.pos=nx.spring_layout(self.graph)
-
-		#plt.clf()
-
-		#Draw the graph so far
-		#nx.draw(self.graph,self.pos,nodelist=self.nodes,node_size=2000,node_color='#52ADDA',edgelist=self.edges,edge_color=self.weights,width=10.0,edge_cmap=plt.cm.Blues,labels=self.labels)
-
-		#And Save it!
-		#plt.savefig(fileName)
