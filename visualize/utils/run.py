@@ -121,7 +121,7 @@ def getPlotlyGraph(asn,graph):
 	        size=0.2,
 	        colorbar=dict(
 	            thickness=15,
-	            title='Hegemony Value for the edges',
+	            title='Hegemony Value for a connection',
 	            xanchor='left',
 	            titleside='right'
 	        ),
