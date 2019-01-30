@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="{% static 'visualize/styling.css' %}">
+	<title>AS Hegemony Visualization</title>
+</head>
+<body>
+	<div class="wrapper fadeInDown">
+	  <div id="formContent">
+	    <!-- Login Form -->
+	    <!--<form action="{% url 'index'%}">-->
+	    <div>
+	    	<form>
+		      <input type="text" id="asn" class="fadeIn second" name="asn" placeholder="Enter ASN#">
+		      <button class="fadeIn fourth" name="enter" id="enter" type="button">ENTER</button>
+		      <!--<input type="submit" class="fadeIn fourth" id="enter" name="enter" value="ENTER">-->
+		    </form>
+	    </div>
+	    <div class="graphDiv" id="graphDiv">
+	  	
+	  	</div>
+	  	<div class="converged" id="converged" >
+	  		<p>Converged!</p>
+	  	</div>
+	  </div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script type="text/javascript">
+    	$("#enter").click(function(){
+    		$("#converged").hide()
+    		var asn = $("#asn").val();
+    		console.log("clicked!")
+
+    		function recursive_get_graph(ASN,graphSoFar=null){
+    			var graphToPassOn;
+    			if(graphSoFar != null){
+    				graphToPassOn = graphSoFar;
+    			}else{
+    				graphToPassOn = null;
+    			}
+
+    			$.ajax({
+	    			url: '{% url "get-graph" %}',
+	        		data: {
+	          			'asn': ASN,
+	          			'graphSoFar':graphToPassOn
+	        		},
+	        		dataType: 'json',
+	        		success: function (data) {
+	        			graphSoFar = data["graphSoFar"]
+	        			graphDiv = data["graphAsDiv"]
+	        			nextASN = data["nextASN"]
+
+	        			$('#graphDiv').html(graphDiv);
+
+	        			if(nextASN == "noVictor"){
+	        				$("#converged").show();
+	        				alert("Converged");
+	        			}else{
+	        				setTimeout(function () {
+					        	recursive_get_graph(nextASN,graphSoFar)
+					    	}, 2000);
+	        			}
+	        			
+	        		}
+        		});
+    		}
+
+    		recursive_get_graph(asn)
+    	});
+    </script>
+</body>
+</html>
