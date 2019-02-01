@@ -15,7 +15,7 @@
 	    <!-- Login Form -->
 	    <!--<form action="{% url 'index'%}">-->
 	    <div>
-	    	<form>
+	    	<form id="asnForm">
 		      <input type="text" id="asn" class="fadeIn second" name="asn" placeholder="Enter ASN (e.g 2497)">
 		      <button class="fadeIn fourth" name="enter" id="enter" type="button">ENTER</button>
 		      <!--<input type="submit" class="fadeIn fourth" id="enter" name="enter" value="ENTER">-->
@@ -33,50 +33,71 @@
 	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
     <script src="{% static 'js/app.js' %}"></script>
     <script type="text/javascript">
+
+    	function recursive_get_graph(ASN,graphSoFar=null){
+			var graphToPassOn;
+			if(graphSoFar != null){
+				graphToPassOn = graphSoFar;
+			}else{
+				graphToPassOn = null;
+			}
+
+			$.ajax({
+    			url: '{% url "get-graph" %}',
+        		data: JSON.stringify({
+          			'asn': ASN,
+          			'graphSoFar':graphToPassOn
+        		}),
+        		type: 'post',
+        		dataType: 'json',
+        		success: function (data) {
+        			graphSoFar = data["graphSoFar"]
+        			graphDiv = data["graphAsDiv"]
+        			nextASN = data["nextASN"]
+
+        			$('#graphDiv').html(graphDiv);
+
+        			if(nextASN == "noVictor"){
+        				$("#converged").html("<p> Graph Generation Complete </p>")
+        			}else{
+        				setTimeout(function () {
+				        	recursive_get_graph(nextASN,graphSoFar)
+				    	}, 200);
+        			}
+        			
+        		}
+    		});
+		}
+
     	$("#converged").hide();
     	$("#enter").click(function(){
-    		$("#converged").html("<p> Generating graph.. This could take some time </p>")
-    		$("#converged").show()
+    		$("#converged").html("<p> Generating graph.. This could take some time </p>");
+    		$("#converged").show();
     		var asn = $("#asn").val();
-    		console.log("clicked!")
+    		console.log("clicked!");
 
-    		function recursive_get_graph(ASN,graphSoFar=null){
-    			var graphToPassOn;
-    			if(graphSoFar != null){
-    				graphToPassOn = graphSoFar;
-    			}else{
-    				graphToPassOn = null;
-    			}
-
-    			$.ajax({
-	    			url: '{% url "get-graph" %}',
-	        		data: JSON.stringify({
-	          			'asn': ASN,
-	          			'graphSoFar':graphToPassOn
-	        		}),
-	        		type: 'post',
-	        		dataType: 'json',
-	        		success: function (data) {
-	        			graphSoFar = data["graphSoFar"]
-	        			graphDiv = data["graphAsDiv"]
-	        			nextASN = data["nextASN"]
-
-	        			$('#graphDiv').html(graphDiv);
-
-	        			if(nextASN == "noVictor"){
-	        				$("#converged").html("<p> Graph Generation Complete </p>")
-	        			}else{
-	        				setTimeout(function () {
-					        	recursive_get_graph(nextASN,graphSoFar)
-					    	}, 200);
-	        			}
-	        			
-	        		}
-        		});
-    		}
-
-    		recursive_get_graph(asn)
+    		recursive_get_graph(asn);
     	});
+
+    	$("#asnForm").submit(function (e) {
+    		console.log("pressed!");
+			$("#converged").html("<p> Generating graph.. This could take some time </p>");
+    		$("#converged").show();
+    		var asn = $("#asn").val();
+    		console.log("pressed!");
+
+    		recursive_get_graph(asn);
+    		e.preventDefault();
+		    if (e.keyCode == 13) {
+		        $("#converged").html("<p> Generating graph.. This could take some time </p>");
+	    		$("#converged").show();
+	    		var asn = $("#asn").val();
+	    		console.log("pressed!");
+
+	    		recursive_get_graph(asn);
+	    	}
+	    });
+
     </script>
 </body>
 </html>
