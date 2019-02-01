@@ -56,7 +56,7 @@ def getLabelsWithIntKeys(labelsWithStringKeys):
 	return labels
 
 
-def getPlotlyGraph(asn,graph):
+def getPlotlyGraph(asn,graph,nextASN):
 	pos = graph.pos
 
 	try:
@@ -172,16 +172,23 @@ def getPlotlyGraph(asn,graph):
 		print("Error in getPlotlyGraph(3): ",e)"""
 
 
+	if nextASN == "noVictor":
+		title = '<br>Converged'
+	else:
+		title = '<br>Fetching data to expand on AS#'+str(nextASN)
+	
+
+
 	try:
 		fig = go.Figure(data=edge_trace+node_trace+[node_trace2],
 	             layout=go.Layout(
-	                title='<br>Expanded from ASN#'+str(asn),
+	                title=title,
 	                titlefont=dict(size=16),
 	                showlegend=False,
 	                hovermode='closest',
 	                margin=dict(b=20,l=5,r=5,t=40),
 	                annotations=[ dict(
-	                    text="Added the strong links between AS'es near ASN#"+str(asn),
+	                    text="Added the strong links between AS'es near AS#"+str(asn),
 	                    showarrow=False,
 	                    xref="paper", yref="paper",
 	                    x=0.005, y=-0.002 ) ],
@@ -213,7 +220,7 @@ def getGraph(asn,G=None):
 			print("exception was raised: ",e)
 			newVictor = "noVictor"
 
-		divContent = getPlotlyGraph(asn,G)
+		divContent = getPlotlyGraph(asn,G,newVictor)
 	except Exception as e:
 		divContent = "<p>Could not grab data from server for "+str(asn)+"</p>"
 		newVictor = "noVictor"
