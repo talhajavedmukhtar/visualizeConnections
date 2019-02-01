@@ -29,18 +29,18 @@ def getGraphForASN(request):
 
 	try:
 		asn, passedOnGraph = getComponentsFromPOST(request)
-		print("ASN: ",asn)
-		print("Graph: ",passedOnGraph)
+		#print("ASN: ",asn)
+		#print("Graph: ",passedOnGraph)
 	except Exception as e:
 		print("Error: ",e)
 
 	if(passedOnGraph):
 		passedOnGraph = jsonpickle.decode(passedOnGraph)
 		graphSoFar, graphAsDiv, newVictor = graphHandler.getGraphSingle(asn,G=passedOnGraph)
-		print("New victor: ",newVictor)
+		#print("New victor: ",newVictor)
 	else:
 		graphSoFar, graphAsDiv, newVictor = graphHandler.getGraphSingle(asn)
-		print("New victor: ",newVictor)
+		#print("New victor: ",newVictor)
 
 	data = {"graphSoFar": jsonpickle.encode(graphSoFar), "graphAsDiv": graphAsDiv, "nextASN": newVictor}
 
