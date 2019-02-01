@@ -6,6 +6,8 @@ from . import graphHandler
 
 import jsonpickle
 
+import json
+
 # Create your views here.
 
 def index(request):
@@ -16,12 +18,21 @@ def index(request):
 
 	return render(request,"visualize/index.html")
 
+def getComponentsFromPOST(request):
+	data = json.loads(request.body)
+	asn = data["asn"]
+	graphSoFar = data["graphSoFar"]
+
+	return int(asn), graphSoFar
+
 def getGraphForASN(request):
-	asn = request.GET["asn"]
 
-	asn = int(asn)
-
-	passedOnGraph = request.GET["graphSoFar"]
+	try:
+		asn, passedOnGraph = getComponentsFromPOST(request)
+		print("ASN: ",asn)
+		print("Graph: ",passedOnGraph)
+	except Exception as e:
+		print("Error: ",e)
 
 	if(passedOnGraph):
 		passedOnGraph = jsonpickle.decode(passedOnGraph)

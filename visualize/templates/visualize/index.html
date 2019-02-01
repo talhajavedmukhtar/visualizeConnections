@@ -50,10 +50,11 @@
 
     			$.ajax({
 	    			url: '{% url "get-graph" %}',
-	        		data: {
+	        		data: JSON.stringify({
 	          			'asn': ASN,
 	          			'graphSoFar':graphToPassOn
-	        		},
+	        		}),
+	        		type: 'post',
 	        		dataType: 'json',
 	        		success: function (data) {
 	        			graphSoFar = data["graphSoFar"]
